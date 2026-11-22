@@ -29,6 +29,7 @@ type Store = {
   signInGithub: (withPrivate?: boolean) => Promise<Result>
   signInUser: (username: string, password: string) => Promise<Result>
   signUpUser: (username: string, password: string) => Promise<Result>
+  changePassword: (password: string) => Promise<Result>
   logout: () => Promise<void>
   setEntry: (date: string, pid: string, patch: { text?: string; mins?: number }) => void
   saveProject: (p: Pick<Project, "name" | "color"> & { id?: string; repo?: string }) => void
@@ -296,6 +297,12 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     return data.session ? {} : { error: "auth.confirmOn" }
   }, [])
 
+  const changePassword = useCallback(async (password: string): Promise<Result> => {
+    if (!supabase) return { error: "auth.notConfigured" }
+    const { error } = await supabase.auth.updateUser({ password })
+    return error ? authError(error.message) : {}
+  }, [])
+
   const logout = useCallback(async () => {
     if (timer.current) await flush()
     if (supabase) {
@@ -322,6 +329,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       signInGithub,
       signInUser,
       signUpUser,
+      changePassword,
       logout,
       setEntry: (date, pid, patch) =>
         mutate((s) => {
@@ -384,7 +392,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       deleteNote: (id) => mutate((s) => ({ ...s, notes: s.notes.filter((n) => n.id !== id) })),
       replaceAll: (n) => mutate(() => n),
     }),
-    [state, ready, loadError, status, needsLogin, user, passwordOn, githubToken, loginPassword, signInGithub, signInUser, signUpUser, logout, mutate]
+    [state, ready, loadError, status, needsLogin, user, passwordOn, githubToken, loginPassword, signInGithub, signInUser, signUpUser, changePassword, logout, mutate]
   )
 
   return <Ctx.Provider value={store}>{children}</Ctx.Provider>

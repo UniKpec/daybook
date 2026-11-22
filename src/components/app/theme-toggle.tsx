@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button"
 import { useI18n } from "@/lib/i18n"
 
 /** Açık / koyu tema düğmesi. Yeni tema, düğmenin olduğu yerden büyüyen bir daireyle ekrana yayılır. */
-export function ThemeToggle({ className }: { className?: string }) {
+export function ThemeToggle({ className, variant = "ghost" }: { className?: string; variant?: "ghost" | "outline" }) {
   const { resolvedTheme, setTheme } = useTheme()
   const { t } = useI18n()
 
@@ -35,7 +35,7 @@ export function ThemeToggle({ className }: { className?: string }) {
   }
 
   return (
-    <Button variant="ghost" size="icon-sm" className={className} aria-label={t("side.theme")} title={t("side.theme")} onClick={toggle}>
+    <Button variant={variant} size="icon-sm" className={className} aria-label={t("side.theme")} title={t("side.theme")} onClick={toggle}>
       <SunIcon className="hidden dark:block" />
       <MoonIcon className="dark:hidden" />
     </Button>

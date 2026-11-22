@@ -6,7 +6,6 @@ import {
   CheckIcon,
   ClockIcon,
   CloudOffIcon,
-  DatabaseBackupIcon,
   FileTextIcon,
   FolderGit2Icon,
   ListTodoIcon,
@@ -14,6 +13,7 @@ import {
   LogOutIcon,
   PencilIcon,
   PlusIcon,
+  SettingsIcon,
   StickyNoteIcon,
 } from "lucide-react"
 import { cn } from "cn"
@@ -69,7 +69,7 @@ export function Sidebar(p: Props) {
   const openOf = (pid: string) => open.filter((x) => x.pid === pid).length
 
   return (
-    <aside className="flex shrink-0 flex-col gap-5 border-b bg-sidebar p-4 md:sticky md:top-0 md:h-svh md:w-[19rem] md:overflow-y-auto md:border-r md:border-b-0">
+    <aside className="flex shrink-0 flex-col gap-5 *:shrink-0 border-b bg-sidebar p-4 md:sticky md:top-0 md:h-svh md:w-[19rem] md:overflow-y-auto md:border-r md:border-b-0">
       <div className="flex items-center gap-2.5 px-1 pt-1">
         <div className="grid size-7 place-items-center rounded-lg bg-primary text-primary-foreground">
           <svg viewBox="0 0 16 16" className="size-3.5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden>
@@ -133,14 +133,21 @@ export function Sidebar(p: Props) {
         ))}
       </div>
 
-      {user && (
-        <p className="mt-auto -mb-3 truncate px-2 text-xs text-muted-foreground" title={user.email}>
-          {user.name}
-        </p>
-      )}
-      <div className={cn("flex items-center gap-0.5", !user && "mt-auto")}>
+      <div className="mt-auto grid gap-1 border-t pt-3">
+        {user && (
+          <button
+            type="button"
+            onClick={p.onSettings}
+            title={t("side.settings")}
+            className="flex min-w-0 items-center gap-2.5 rounded-lg px-2 py-1.5 text-left outline-none transition-colors hover:bg-muted focus-visible:ring-3 focus-visible:ring-ring/50"
+          >
+            <span className="grid size-6 shrink-0 place-items-center rounded-full bg-muted text-xs font-semibold uppercase">{user.name.slice(0, 1)}</span>
+            <span className="truncate text-sm">{user.name}</span>
+          </button>
+        )}
+        <div className="flex items-center gap-0.5">
         <Button variant="ghost" size="sm" className="justify-start text-muted-foreground" onClick={p.onSettings}>
-          <DatabaseBackupIcon /> {t("side.backup")}
+          <SettingsIcon /> {t("side.settings")}
         </Button>
         <span className="ml-auto flex items-center gap-1.5 pr-1 text-xs text-muted-foreground" role="status">
           {status === "saving" && (
@@ -174,7 +181,8 @@ export function Sidebar(p: Props) {
             <LogOutIcon />
           </Button>
         )}
-        <ThemeToggle className="text-muted-foreground" />
+          <ThemeToggle className="text-muted-foreground" />
+        </div>
       </div>
     </aside>
   )
