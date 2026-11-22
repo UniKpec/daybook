@@ -19,6 +19,7 @@ import {
 import { cn } from "cn"
 import { Button } from "@/components/ui/button"
 import { Calendar } from "@/components/ui/calendar"
+import { ThemeToggle } from "./theme-toggle"
 import { parse, ymd } from "@/lib/dates"
 import { useI18n } from "@/lib/i18n"
 import { useStore } from "@/lib/store"
@@ -42,8 +43,6 @@ type Props = {
 // Takvimde gün altındaki noktalar: yeşil = rapor var, sarı = o güne planlı açık iş var.
 const DOT = "relative after:pointer-events-none after:absolute after:bottom-1 after:z-10 after:size-1 after:rounded-full"
 const DOT2 = "before:pointer-events-none before:absolute before:bottom-1 before:z-10 before:size-1 before:rounded-full"
-
-import { ThemeToggle } from "./theme-toggle"
 
 export function Sidebar(p: Props) {
   const { state, status, mode, user, passwordOn, logout } = useStore()

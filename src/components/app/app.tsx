@@ -80,6 +80,10 @@ export function App() {
         id={projDialog.id}
         onOpenChange={(open) => setProjDialog((p) => ({ ...p, open }))}
         onDeleted={(id) => filterPid === id && setFilterPid(null)}
+        onGithub={() => {
+          setProjDialog((p) => ({ ...p, open: false }))
+          setGithubOpen(true)
+        }}
       />
       <SettingsDialog open={settingsOpen} onOpenChange={setSettingsOpen} />
       <GithubImportDialog open={githubOpen} onOpenChange={setGithubOpen} />

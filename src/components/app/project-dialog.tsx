@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { CheckIcon } from "lucide-react"
+import { CheckIcon, FolderGit2Icon } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
@@ -10,20 +10,20 @@ import { useStore } from "@/lib/store"
 import { COLORS } from "@/lib/types"
 import { Field } from "./field"
 
-type Props = { open: boolean; id: string | null; onOpenChange: (o: boolean) => void; onDeleted: (id: string) => void }
+type Props = { open: boolean; id: string | null; onOpenChange: (o: boolean) => void; onDeleted: (id: string) => void; onGithub: () => void }
 
-export function ProjectDialog({ open, id, onOpenChange, onDeleted }: Props) {
+export function ProjectDialog({ open, id, onOpenChange, onDeleted, onGithub }: Props) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md">
-        <Body id={id} close={() => onOpenChange(false)} onDeleted={onDeleted} />
+        <Body id={id} close={() => onOpenChange(false)} onDeleted={onDeleted} onGithub={onGithub} />
       </DialogContent>
     </Dialog>
   )
 }
 
-function Body({ id, close, onDeleted }: { id: string | null; close: () => void; onDeleted: (id: string) => void }) {
-  const { state, saveProject, deleteProject } = useStore()
+function Body({ id, close, onDeleted, onGithub }: { id: string | null; close: () => void; onDeleted: (id: string) => void; onGithub: () => void }) {
+  const { state, saveProject, deleteProject, mode, user } = useStore()
   const { t } = useI18n()
   const p = state.projects.find((x) => x.id === id)
   const [name, setName] = useState(p?.name || "")
@@ -50,6 +50,21 @@ function Body({ id, close, onDeleted }: { id: string | null; close: () => void; 
         <DialogTitle>{p ? t("proj.edit") : t("proj.new")}</DialogTitle>
         <DialogDescription>{t("proj.desc")}</DialogDescription>
       </DialogHeader>
+
+      {/* GitHub ile giriş yapanlar yeni projeyi repolarından da seçebilir. */}
+      {!p && mode === "cloud" && user?.github && (
+        <>
+          <Button type="button" variant="outline" onClick={onGithub}>
+            <FolderGit2Icon data-icon="inline-start" />
+            {t("proj.fromGithub")}
+          </Button>
+          <div className="flex items-center gap-3 text-xs text-muted-foreground">
+            <span className="h-px flex-1 bg-border" />
+            {t("proj.or")}
+            <span className="h-px flex-1 bg-border" />
+          </div>
+        </>
+      )}
 
       <Field label={t("proj.name")} htmlFor="p-name">
         <Input id="p-name" value={name} onChange={(e) => setName(e.target.value)} required maxLength={60} placeholder={t("proj.namePh")} />

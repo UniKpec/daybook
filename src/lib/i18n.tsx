@@ -188,6 +188,8 @@ const tr = {
   "auth.notConfigured": "Supabase ayarlı değil.",
 
   "gh.title": "GitHub'dan proje ekle",
+  "proj.fromGithub": "GitHub repolarından seç",
+  "proj.or": "ya da elle ekle",
   "gh.desc": "Repolarından seçtiklerin proje olarak eklenir. Yalnızca adları alınır; kod ya da commit okunmaz.",
   "gh.reconnectText": "Repo listesini görmek için GitHub bağlantısını yenilemen gerekiyor.",
   "gh.reconnect": "GitHub'a yeniden bağlan",
@@ -392,6 +394,8 @@ const en: Record<TKey, string> = {
   "auth.notConfigured": "Supabase isn't configured.",
 
   "gh.title": "Add projects from GitHub",
+  "proj.fromGithub": "Pick from your GitHub repositories",
+  "proj.or": "or add one by hand",
   "gh.desc": "The repositories you pick are added as projects. Only their names are read; no code or commits.",
   "gh.reconnectText": "Reconnect GitHub to see your repository list.",
   "gh.reconnect": "Reconnect GitHub",
