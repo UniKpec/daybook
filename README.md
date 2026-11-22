@@ -1,18 +1,36 @@
-# Günlük
+# Daybook
 
-Günlük çalışma raporları, yapılacaklar ve notlar için sade bir defter. Projelere göre gruplar, gün gün rapor tutar ve "bugün ne yaptın?" diyene raporu tek tıkla paylaşır.
+A calm work log for people who get asked "what did you do today?"
 
-- **Raporlar:** Takvimden günü seç, her projeye o gün ne yaptığını ve kaç saat çalıştığını yaz.
-- **Yapılacaklar:** Proje bazlı iş listeleri. İşlere son tarih verilir, başkasını bekleyen işler "bekliyor" olarak işaretlenir; tamamlananlar o günün raporuna eklenir.
-- **Süre özeti:** Haftalık ve aylık çalışma süresi, projelere ve günlere göre.
-- **İki dil:** Türkçe ve İngilizce (English: the app is called Daybook).
-- **Notlar ve planlar:** Serbest notlar; bir projeye bağlı ya da genel.
-- **Paylaş:** Gün, hafta, ay ya da özel aralık için raporu WhatsApp metni, Markdown ya da PDF olarak al.
-- **GitHub (isteğe bağlı):** GitHub ile giriş yapanlar repolarının adlarını proje olarak ekleyebilir. Yalnızca adlar alınır.
+Write a short report per project each day, keep your to-dos and notes next to it, and share any day, week or month as a ready-to-paste summary.
 
-Arayüz Next.js ve shadcn/ui, backend FastAPI (`api/index.py`), veritabanı ve giriş Supabase.
+**English** · [Türkçe](README.tr.md)
 
-## Çalıştırma
+## Features
+
+- **Daily reports** — pick a day on the calendar and write what you did on each project, with the hours you spent.
+- **To-dos** — per-project task lists with due dates. Mark a task as waiting on someone else. Completed tasks are added to that day's report.
+- **Notes and plans** — free-form notes, attached to a project or general.
+- **Time summary** — weekly and monthly totals by project and by day.
+- **Share** — export a day, week, month or custom range as WhatsApp text, Markdown or PDF.
+- **Accounts** — sign up with just a username and password, or continue with GitHub. Everyone sees only their own records.
+- **GitHub import (optional)** — add your repositories as projects. Only the names are read.
+- **Turkish and English**, light and dark theme.
+
+## Stack
+
+| Layer | Technology |
+|---|---|
+| Frontend | Next.js (App Router), React, Tailwind CSS, shadcn/ui |
+| Backend | FastAPI (`api/index.py`) |
+| Database and auth | Supabase (Postgres with row-level security) |
+| Hosting | Vercel (the FastAPI app runs as a Python function in the same project) |
+
+Sign-in happens in the browser through Supabase Auth. Reads and writes go through the FastAPI backend, which forwards the user's session token to Supabase. Row-level security therefore applies to every request and no secret key is needed anywhere.
+
+## Run locally
+
+Requirements: Node.js 20+ and Python 3.10+.
 
 ```bash
 npm install
@@ -20,30 +38,51 @@ pip install -r requirements.txt
 npm run dev
 ```
 
-`npm run dev` arayüzü (3210) ve FastAPI backend'ini (8210) birlikte başlatır. Python 3.10 ya da üstü gerekir.
+Open `http://localhost:3210`. `npm run dev` starts the web app (port 3210) and the FastAPI backend (port 8210) together.
 
-Tarayıcıda `http://localhost:3210` adresini aç. Windows'ta `baslat.bat` dosyasına çift tıklamak da yeter.
+With no configuration the app asks for no sign-in and stores everything in `data/gunluk.json` on your machine. Python is not needed in this mode.
 
-Hiçbir ayar yapmadan çalıştırırsan giriş sorulmaz ve kayıtlar `data/gunluk.json` dosyasında durur; bu kipte Python kurulu olmasa da uygulama çalışır.
+## Accounts and cloud storage (Supabase)
 
-## Hesapla giriş ve bulutta kayıt (Supabase)
+1. Create a Supabase project.
+2. In the SQL Editor, run `supabase/kurulum.sql`.
+3. Under Authentication → Sign In / Providers → Email, turn off **Confirm email**. Username sign-up needs this, because no real email address is collected.
+4. Copy `.env.example` to `.env.local` and fill in `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY`. Use the publishable (anon) key, never the secret key.
+5. Under Authentication → URL Configuration, set the Site URL and add your app's address to Redirect URLs (`http://localhost:3210` and your deployed URL).
 
-1. Supabase'de bir proje oluştur.
-2. SQL Editor'de `supabase/kurulum.sql` dosyasını çalıştır.
-3. `.env.example` dosyasını `.env.local` adıyla kopyala; `NEXT_PUBLIC_SUPABASE_URL` ve `NEXT_PUBLIC_SUPABASE_ANON_KEY` değerlerini doldur. Buraya publishable (anon) anahtar yazılır, secret anahtar değil.
-4. Authentication → Sign In / Providers → Email bölümünde **Confirm email** ayarını kapat (kullanıcı adıyla kayıt için gerekli).
-5. Authentication → URL Configuration bölümünde Site URL'i ve Redirect URLs listesini uygulamanın adresiyle doldur (`http://localhost:3210` ve yayındaki adres).
+The app now asks for sign-in. Since no email is collected, a forgotten password can only be reset from the Supabase dashboard (Authentication → Users).
 
-Bundan sonra uygulama giriş ister; herkes bir kullanıcı adı ve şifreyle kayıt olup yalnızca kendi kayıtlarını görür. E-posta sorulmaz; bu yüzden unutulan şifre ancak Supabase panelinden (Authentication → Users) sıfırlanır.
-
-Giriş tarayıcıda Supabase ile yapılır. Kayıtlar FastAPI backend'i üzerinden okunup yazılır (`/api/py/state`); backend, kullanıcının oturum anahtarıyla Supabase'e gider, bu yüzden gizli (secret) anahtar gerekmez. Uç noktaların dökümü: `http://localhost:3210/api/py/docs`.
-
-### GitHub ile giriş
+### Continue with GitHub
 
 1. GitHub → Settings → Developer settings → OAuth Apps → New OAuth App.
-   - Authorization callback URL: `https://<proje-kodun>.supabase.co/auth/v1/callback`
-2. Supabase → Authentication → Sign In / Providers → GitHub'ı aç; Client ID ve Client Secret değerlerini gir.
+   - Authorization callback URL: `https://<project-ref>.supabase.co/auth/v1/callback`
+2. Supabase → Authentication → Sign In / Providers → GitHub: enable it and paste the Client ID and Client Secret.
 
-## Yayınlama (Vercel)
+## Deploy to Vercel
 
-Repoyu Vercel'e bağla (Framework: Next.js). `api/index.py` Python fonksiyonu olarak kendiliğinden yayınlanır; ayrı sunucu gerekmez. `.env.local` içindeki iki Supabase değerini Environment Variables bölümüne gir. Yayındaki adresi Supabase'in Redirect URLs listesine eklemeyi unutma.
+1. Import the repository in Vercel (framework: Next.js).
+2. Add `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` as environment variables.
+3. Deploy, then add the deployed URL to Supabase's Site URL and Redirect URLs.
+
+`api/index.py` is deployed automatically as a Python function; no separate server is required. `https://<your-app>/api/py/health` should return `{"ok": true, "supabase": true}`.
+
+## API
+
+| Method | Path | Description |
+|---|---|---|
+| GET | `/api/py/health` | Health check |
+| GET | `/api/py/state` | Records of the signed-in account |
+| PUT | `/api/py/state` | Save the records of the signed-in account |
+
+Both `state` endpoints expect `Authorization: Bearer <Supabase access token>`. Interactive docs are at `/api/py/docs`.
+
+## Project layout
+
+```
+api/index.py          FastAPI backend
+src/app/              Next.js pages and the local-file API routes
+src/components/app/   Screens: reports, to-dos, notes, time summary, sign-in
+src/components/ui/    shadcn/ui components
+src/lib/              State store, i18n, dates, report export
+supabase/kurulum.sql  Table and row-level security policies
+```
