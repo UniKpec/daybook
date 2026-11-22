@@ -10,8 +10,12 @@ const FILE = path.join(DIR, "gunluk.json")
 const json = (body: unknown, status = 200) =>
   Response.json(body, { status, headers: { "x-gunluk-auth": authEnabled ? "on" : "off" } })
 const denied = () => json({ error: "Giriş gerekli." }, 401)
+// Hesaplı kipte (Supabase ayarlıyken) dosya hiç kullanılmaz; bu adres kapalıdır.
+const cloud = !!process.env.NEXT_PUBLIC_SUPABASE_URL?.trim() && !!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY?.trim()
+const closed = () => json({ error: "Bulunamadı." }, 404)
 
 export async function GET(req: Request) {
+  if (cloud) return closed()
   if (!isAuthed(req)) return denied()
   try {
     return json(JSON.parse(await fs.readFile(FILE, "utf8")))
@@ -22,6 +26,7 @@ export async function GET(req: Request) {
 }
 
 async function write(req: Request) {
+  if (cloud) return closed()
   if (!isAuthed(req)) return denied()
   let body: unknown
   try {

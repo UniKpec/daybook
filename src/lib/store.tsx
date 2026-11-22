@@ -61,7 +61,6 @@ export function normalize(d: Partial<State> | null | undefined): State {
     notes: Array.isArray(d?.notes) ? d.notes : [],
   }
 }
-const isEmpty = (s: State) => !s.projects.length && !s.todos.length && !s.notes.length && !Object.keys(s.entries).length
 
 const GH_KEY = "gunluk.github-token"
 const AUTH_ERRORS: [RegExp, TKey][] = [
@@ -133,15 +132,8 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     }
     if (!userId.current) return null
     const { data } = await (await api("GET")).json()
-    if (data) return normalize(data)
-    // Hesabın ilk açılışı: bu bilgisayarda dosyada duran kayıtlar varsa hesaba taşınır.
-    let first = EMPTY
-    try {
-      const r = await fetch("/api/state", { cache: "no-store" })
-      if (r.ok) first = normalize(await r.json())
-    } catch {}
-    if (!isEmpty(first)) await api("PUT", { data: first })
-    return first
+    // Yeni hesap boş başlar.
+    return normalize(data)
   }, [])
 
   const write = useCallback(async (s: State) => {
